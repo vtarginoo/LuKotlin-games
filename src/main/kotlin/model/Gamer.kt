@@ -1,8 +1,8 @@
 package model
-import java.util.Scanner
+import java.util.*
 import kotlin.random.Random
 
-data class Gamer(val nome:String, var email:String) {
+data class Gamer(val nome:String, var email:String): Recomendavel {
 
     var dataNascimento:String? = null
     var usuario:String? = null
@@ -14,8 +14,26 @@ data class Gamer(val nome:String, var email:String) {
         }
     var idInterno:String? = null
         private set
-
+    var plano:Plano = PlanoAvulso("BRONZE")
     var jogosBuscados = mutableListOf<Jogo?>()
+    var jogosAlugados = mutableListOf<Aluguel>()
+    private val listaNotas = mutableListOf<Int>()
+    var jogosRecomendados = mutableListOf<Jogo?>()
+
+    override val media: Double
+        get() = listaNotas.average()
+
+
+
+    override fun recomendar(nota: Int) {
+        listaNotas.add(nota)
+    }
+
+    fun recomendarJogo(jogo: Jogo, nota: Int) {
+        jogo.recomendar(nota)
+        jogosRecomendados.add(jogo)
+    }
+
 
     constructor(nome: String, email: String, dataNascimento:String, usuario:String):
             this(nome, email) {
@@ -33,7 +51,10 @@ data class Gamer(val nome:String, var email:String) {
 
 
     override fun toString(): String {
-        return "Gamer(nome='$nome', email='$email', dataNascimento=$dataNascimento, usuario=$usuario, idInterno=$idInterno)"
+        return "Gamer(nome='$nome', email='$email'," +
+                " dataNascimento=$dataNascimento, usuario=$usuario," +
+                " idInterno=$idInterno," +
+                " Reputação= $media)"
     }
 
     fun criarIdInterno(){
@@ -52,6 +73,25 @@ data class Gamer(val nome:String, var email:String) {
             throw IllegalArgumentException("Email inválido")
         }
     }
+
+    fun alugaJogo(jogo:Jogo,periodo: Periodo):Aluguel{
+
+        val aluguel = Aluguel(this, jogo, periodo)
+        jogosAlugados.add(aluguel)
+
+        return aluguel
+    }
+
+    fun jogosDoMes(mes:Int): List<Jogo> {
+        return jogosAlugados
+            .filter { aluguel ->  aluguel.periodo.dataInicial.monthValue == mes}
+            .map { aluguel ->  aluguel.jogo}
+    }
+
+
+
+
+
 
     companion object {
         fun criarGamer(leitura: Scanner): Gamer {
