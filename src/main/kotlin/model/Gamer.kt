@@ -12,6 +12,7 @@ data class Gamer(val nome:String, var email:String): Recomendavel {
                 criarIdInterno()
             }
         }
+    var id = 0
     var idInterno:String? = null
         private set
     var plano:Plano = PlanoAvulso("BRONZE")
@@ -22,6 +23,17 @@ data class Gamer(val nome:String, var email:String): Recomendavel {
 
     override val media: Double
         get() = listaNotas.average()
+
+
+    constructor(nome: String, email: String, dataNascimento:String?, usuario:String?, id: Int = 0):
+            this(nome, email) {
+        this.dataNascimento = dataNascimento
+        this.usuario = usuario
+        this.id = id
+        criarIdInterno()
+    }
+
+
 
 
 
